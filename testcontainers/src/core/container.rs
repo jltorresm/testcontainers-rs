@@ -182,6 +182,20 @@ where
         .unwrap_or_else(|_| panic!("container {} has missing or invalid bridge IP", self.id))
     }
 
+    /// Returns the gateway ip address of docker container as specified in NetworkSettings.Gateway
+    pub fn get_gateway_ip_address(&self) -> IpAddr {
+        IpAddr::from_str(
+            &self
+                .docker_client
+                .inspect(&self.id)
+                .network_settings
+                .unwrap_or_default()
+                .gateway
+                .unwrap_or_default(),
+        )
+        .unwrap_or_else(|_| panic!("container {} has missing or invalid gateway IP", self.id))
+    }
+
     pub fn exec(&self, cmd: ExecCommand) {
         let ExecCommand {
             cmd,
